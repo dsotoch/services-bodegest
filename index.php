@@ -1,10 +1,6 @@
 <?php
-require_once __DIR__ . '/../vendor/autoload.php';
-
-use Dotenv\Dotenv;
-
-$dotenv = Dotenv::createImmutable(__DIR__);
-$dotenv->safeLoad();
+require_once __DIR__ . '/vendor/autoload.php';
+require_once __DIR__.'/loadEnv.php';
 $adminurl = $_ENV['AdminURL'];
 $contact = $_ENV['CONTACT'] . 'Hola, Estoy Interesado en BodeGest ,Solicito una Demostración.';
 
