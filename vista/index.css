@@ -1,0 +1,106 @@
+.body {
+    background-color: #151515;
+    color: white;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    padding: 10px;
+}
+.link{
+    color: white;
+    text-decoration: none;
+}
+.title {
+    text-align: center;
+    margin: 20px;
+    padding: 10px;
+    color: white;
+    background-color: black;
+
+    font-size: x-large;
+    border-radius: 10px;
+}
+
+.logo {
+    justify-content: start;
+    text-align: start;
+}
+
+.bode {
+    color: orange;
+    font-size: xx-large;
+}
+
+.gest {
+    color: yellowgreen;
+    font-size: xx-large;
+}
+.descr{
+   background-color: rgb(4, 22, 46) !important;
+}
+
+.p-description {
+
+    color: white;
+}
+ul {
+    list-style-type: none;
+}
+.check{
+    color: greenyellow !important;
+}
+
+.fact {
+    margin: 20px;
+    padding: 15px;
+}
+
+#logo {
+    height: 150px;
+    object-fit: cover;
+    transform: scale3d(1, 1, 1);
+    animation: scale 4s ease-in-out;
+}
+.check2{
+    color: orange;
+    margin-right: 5px;
+}
+.sub{
+    font-size: large;
+    color: orange;
+
+}
+.elegir{
+    border-radius: 5px;
+    background-color: rgb(4, 22, 46) !important;
+    justify-content: center;
+    text-align: center;
+}
+.elegi2{
+    border-radius: 5px;
+    padding: 10px;
+    background-color: rgb(4, 22, 46) !important;
+    
+}
+#img-datacenter{
+    width: 100%;
+    object-fit: contain;
+}
+#img-elastika{
+    justify-content: center;
+    text-align: center;
+    align-items: center;
+    
+}
+#plan{
+    width: 100%;
+    object-fit: cover;
+    
+}
+@keyframes scale {
+    from {
+        transform: scale3d(1, 1, 1);
+    }
+
+    to {
+        transform: scale3d(2, 2, 2);
+    }
+}

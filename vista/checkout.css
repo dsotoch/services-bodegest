@@ -1,0 +1,46 @@
+#payments{
+  color: black !important;
+}
+#header_title{
+  background-color: #151515;
+  color: white;
+}
+body{
+  background-color: #151515;
+  color: white !important;
+  margin: 10px;
+}
+.container{
+  display: flex !important;
+  justify-content: center;
+}
+.modal-content{
+  background-color: #151515 !important;
+  color: white !important;
+}
+
+#exampleModal p {
+  color: white;
+}
+#exampleModal h5 {
+  color: springgreen;
+}
+.btn-close{
+  background-color: white !important;
+}
+#div_check{
+  width: 50%;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid white;
+}
+.card{
+  background-color: #151515;
+}
+@media (max-width: 768px) {
+  #div_check{
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+  }
+}
