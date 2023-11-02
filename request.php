@@ -7,6 +7,7 @@ require_once __DIR__ . '/loadEnv.php';
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
+<script src="https://static.micuentaweb.pe/static/js/krypton-client/V4.0/stable/kr-payment-form.min.js"></script>
 <script src="https://static.micuentaweb.pe/static/js/krypton-client/V4.0/stable/kr-payment-form.min.js" kr-public-key=<?php echo PUBLIC_KEY ?> kr-post-url-success="paid.php" ; kr-language="es-ES">
 </script>
 <link rel="stylesheet" href="https://static.micuentaweb.pe/static/js/krypton-client/V4.0/ext/neon-reset.min.css">
@@ -52,18 +53,44 @@ if ($_SERVER['REQUEST_METHOD'] === "POST") {
       header("Location: checkout.php");
       die();
     }
-     #VERIFICAR QUE EL DNI NO SE ENCUENTRE REGISTRADO
-     $connectivity->conn->begin_transaction(MYSQLI_TRANS_START_READ_ONLY);
-     $sql = "SELECT dni FROM users where dni='$dni'";
-     $existEmail = $connectivity->getMysql($sql);
-     if (!empty($existEmail)) {
-       $connectivity->conn->commit();
-       $connectivity->conn->close();
-       response("er", "ERROR: El Dni ya Se Encuentra Registrado.");
-       header("Location: checkout.php");
-       die();
-     }
+    #VERIFICAR QUE EL DNI NO SE ENCUENTRE REGISTRADO
+    $connectivity->conn->begin_transaction(MYSQLI_TRANS_START_READ_ONLY);
+    $sql = "SELECT dni FROM users where dni='$dni'";
+    $existEmail = $connectivity->getMysql($sql);
+    if (!empty($existEmail)) {
+      $connectivity->conn->commit();
+      $connectivity->conn->close();
+      response("er", "ERROR: El Dni ya Se Encuentra Registrado.");
+      header("Location: checkout.php");
+      die();
+    }
+    $fecha = date("Y-m-d\TH:i:sP");
+    $dia = date("d", strtotime($fecha));
+    $rule = "";
+    switch ($dia) {
+      case 28:
+        $dia_inicio = "28";
+        $rule = "RRULE:FREQ=MONTHLY;INTERVAL=1;BYMONTHDAY=$dia_inicio;COUNT=12";
+        break;
+      case 29:
+        $dia_inicio = "29";
+        $rule = "RRULE:FREQ=MONTHLY;INTERVAL=1;BYMONTHDAY=$dia_inicio;COUNT=12";
+        break;
+      case 30:
+        $dia_inicio = "30";
+        $rule = "RRULE:FREQ=MONTHLY;INTERVAL=1;BYMONTHDAY=$dia_inicio;COUNT=12";
+        break;
+      case 31:
+        $dia_inicio = "31";
+        $rule = "RRULE:FREQ=MONTHLY;INTERVAL=1;BYMONTHDAY=$dia_inicio;COUNT=12";
+        break;
 
+      default:
+        $dia_inicio = $dia;
+
+        $rule = "RRULE:FREQ=MONTHLY;INTERVAL=1;BYMONTHDAY=$dia_inicio;COUNT=12";
+        break;
+    }
     $store = array(
       "amount" => 2200,
       "currency" => "PEN",
@@ -108,8 +135,8 @@ if ($_SERVER['REQUEST_METHOD'] === "POST") {
     $response = json_decode($response);
     if ($response->status != 'SUCCESS') {
       /* an error occurs, I throw an exception */
-      $error = $response['answer'];
-      response("er", $error['errorMessage']);
+      $error = $response->answer;
+      response("er", $error->errorMessage);
       header("Location: checkout.php");
       die();
     }
@@ -136,4 +163,5 @@ function response($key, $message)
 {
   $_SESSION["response"] = array($key => $message);
 }
+
 exit();

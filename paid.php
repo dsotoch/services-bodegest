@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/config.php';
+
 session_start();
 if (!checkHash($_POST, SHA_KEY)) {
     response("er", 'Invalid signature.');
@@ -19,7 +20,6 @@ function checkHash($data, $key)
     return ($hash == $data['kr-hash']);
 }
 $responseData = json_decode($answer, true);
-
 // Acceder a algunos datos
 $orderId = $responseData['orderDetails']['orderId'];
 $orderTotalAmount = $responseData['orderDetails']['orderTotalAmount'];
@@ -34,6 +34,7 @@ $identityCode = $responseData["customer"]["billingDetails"]["identityCode"];
 $sus_client = $identityCode;
 
 
+
 #VERIFICAR SI YA CUENTA CON UNA SUSCRIPCION
 require_once __DIR__ . '/connectivity.php';
 $connectivity = new Connectivity();
@@ -46,11 +47,15 @@ if (!$connectivity->isConnectionActive()) {
 $sql = "SELECT id FROM users WHERE email = '$customerEmail'";
 $userId = $connectivity->getMysql($sql);
 if (!empty($userId)) {
-    suscription($connectivity, $userId, $token, $orderId,$suscripcion_id, $sus_client);
+    suscription($connectivity, $userId, $token, $orderId, $suscripcion_id, $sus_client);
 } else {
     // El usuario no existe    
     if (insertUserAndPersonaBD($connectivity, $identityCode, $customerLastName, $customerEmail, $customerFirstName, $customerPhone)) {
-        suscription($connectivity, $userId, $token, $orderId,$suscripcion_id, $sus_client);
+        $connectivity->conn->begin_transaction(MYSQLI_TRANS_START_READ_ONLY);
+        $sqll = "SELECT id FROM users WHERE email = '$customerEmail'";
+        $userId = $connectivity->getMysql($sqll);
+        $connectivity->conn->commit();
+        suscription($connectivity, $userId, $token, $orderId, $sus_client);
     } else {
         response("er", "Datos proporcionados Invalidos.Intentalo mas tarde.");
         $connectivity->conn->close();
@@ -60,7 +65,7 @@ if (!empty($userId)) {
 }
 
 
-function suscription(Connectivity $connectivity, $userId, $token,$orderId,$suscripcion_id, $sus_client)
+function suscription(Connectivity $connectivity, $userId, $token, $orderId, $sus_client)
 {
 
     $sql2 = "SELECT * FROM suscripcions WHERE user_id = ? AND estado = 'ACTIVO'";
@@ -79,75 +84,11 @@ function suscription(Connectivity $connectivity, $userId, $token,$orderId,$suscr
         header("Location: checkout.php");
         die();
     } else {
-        // El usuario no tiene suscripciones activas
-        $url = "https://api.micuentaweb.pe/api-payment/V4/Charge/CreateSubscription";
-        $credentials = base64_encode(USERNAME . ':' . PASSWORD);
+        $fecha = new DateTime("now",new DateTimeZone("America/Lima"));
 
-        $curl = curl_init();
-        $fecha = date("Y-m-d\TH:i:sP");
-        $dia = date("d", strtotime($fecha));
-        $rule = "";
-        switch ($dia) {
-            case 28:
-                $dia_inicio = "28";
-                $rule = "RRULE:FREQ=MONTHLY;INTERVAL=1;BYMONTHDAY=$dia_inicio;";
-                break;
-            case 29:
-                $dia_inicio = "29";
-                $rule = "RRULE:FREQ=MONTHLY;INTERVAL=1;BYMONTHDAY=$dia_inicio;";
-                break;
-            case 30:
-                $dia_inicio = "30";
-                $rule = "RRULE:FREQ=MONTHLY;INTERVAL=1;BYMONTHDAY=$dia_inicio;";
-                break;
-            case 31:
-                $dia_inicio = "31";
-                $rule = "RRULE:FREQ=MONTHLY;INTERVAL=1;BYMONTHDAY=$dia_inicio;";
-                break;
-
-            default:
-                $dia_inicio = $dia;
-
-                $rule = "RRULE:FREQ=MONTHLY;INTERVAL=1;BYMONTHDAY=$dia_inicio;";
-                break;
-        }
-        $data = array(
-            "amount" => intval(AMOUNT),
-            "description" => "Plan Bodegest" . "-" . ENTERPRISE,
-            "currency" => "PEN",
-            "effectDate" => date("c"),
-            "paymentMethodToken" => $token,
-            "orderId" => $orderId,
-            "rrule" => $rule,
-            "transactionOptions" => [
-                "cardOptions" => [
-                    "installmentNumber" => 1,
-                ]
-            ],
-            "initialAmount" => 100,
-            "initialAmountNumber" => 1,
-        );
-
-        $options = array(
-            CURLOPT_URL => $url,
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_POST => true,
-            CURLOPT_HTTPHEADER => [
-                "Authorization: Basic " . $credentials,
-                "Content-Type: application/json"
-            ],
-            CURLOPT_POSTFIELDS => json_encode($data),
-        );
-        curl_setopt_array($curl, $options);
-        $response = curl_exec($curl);
-
-        $response = json_decode($response, true);
-        curl_close($curl);
-        $effectDate = date($response["answer"]["effectDate"]);
-        $amount = $response["answer"]["amount"];
-        $suscripcion_id = $response["answer"]["subscriptionId"];
-
-
+        $effectDate = $fecha->format("y-m-d");
+        $amount = "22";
+        $suscripcion_id = random_int(1, 500);
         #ACTUALIZAR PLAN DE LA PERSONA DB
         $connectivity->conn->begin_transaction(MYSQLI_TRANS_START_READ_WRITE);
         $sql3 = "UPDATE personas SET plan=? WHERE user_id=? ";
@@ -170,31 +111,82 @@ function suscription(Connectivity $connectivity, $userId, $token,$orderId,$suscr
             //echo "Error al preparar la sentencia SQL: " . $connectivity->conn->error;
         }
 
-        #INSERTAR SUSCRIPCION  DB
         $connectivity->conn->begin_transaction(MYSQLI_TRANS_START_READ_WRITE);
-        $sql3 = "INSERT INTO suscripcions(card_id,suscripcion_id,cancelado_al_finalizar_periodo,fecha_cargo,fecha_creacion,numero_periodo_actual,fecha_fin_periodo,estado,fecha_fin_prueba,cantidad_cargo_predeterminada,id_plan,id_cliente,user_id) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?) ";
+        $sql3 = "INSERT INTO suscripcions(card_id, suscripcion_id, cancelado_al_finalizar_periodo, fecha_cargo, fecha_creacion, numero_periodo_actual, fecha_fin_periodo, estado, fecha_fin_prueba, cantidad_cargo_predeterminada, id_plan, id_cliente, user_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        $sql4 = "INSERT INTO pagos(monto, descripcion, suscripcion_id,periodo,estado,fechaCargo) VALUES (?, ?, ?,?,?,?)";
         $stmt4 = $connectivity->conn->prepare($sql3);
+        $stmt5 = $connectivity->conn->prepare($sql4);
 
-        if ($stmt4) {
+        if ($stmt4 && $stmt5) {
             $cncl = true;
             $np = 1;
             $p_state = "ACTIVO";
             $id_plan = 1;
-            $amount2 = number_format($amount / 100, 2);
-            $stmt4->bind_param("ssssssssssisi", $token, $suscripcion_id, $cncl, $effectDate, $effectDate, $np, $effectDate, $p_state, $effectDate, $amount2, $id_plan, $sus_client, $userId["id"]);
-            // Ejecutar la sentencia SQL
+            $DateCreated= new DateTime("now",new DateTimeZone("America/Lima"));
+
+            $stmt4->bind_param("ssssssssssisi", $token, $suscripcion_id, $cncl, $effectDate, $DateCreated, $np, $effectDate, $p_state, $effectDate, $amount, $id_plan, $sus_client, $userId["id"]);
+
             if ($stmt4->execute()) {
-                $connectivity->conn->commit(); // Confirmar la transacción
-                $stmt4->close(); // Cerrar la sentencia
-                response("sus", "Suscripción creada Correctamente.En breve recibiras un Correo con todos los Datos.");
+                // Obtener el último ID insertado después de la ejecución de la primera consulta
+                $lastInsertedID = $stmt4->insert_id;
+
+                $stmt4->close();
+                $descripcion = "plan basico";
+                $periods = ChronogramGenerate();
+                $p = 1;
+                try {
+                    foreach ($periods as $fe) {
+                        $status = ($p == 1) ? true : false;
+                        $fec= $fe;
+                        $stmt5->bind_param("ssssis", $amount, $descripcion, $lastInsertedID, $p, $status, $fec);
+
+                        if (!$stmt5->execute()) {
+                            throw new Exception("Error al registrar pago: " . $stmt5->error);
+                        }
+                        $p++;
+                    }
+
+                    $connectivity->conn->commit(); // Confirmar la transacción
+                    $stmt5->close();
+                    response("sus", "Suscripción creada Correctamente. En breve recibirás un Correo con todos los Datos.");
+                } catch (Exception $e) {
+                    $stmt5->close();
+                    $connectivity->conn->rollback(); // Revertir la transacción en caso de error
+                    response("er", $e->getMessage());
+                }
             } else {
+                $stmt4->close();
                 $connectivity->conn->rollback(); // Revertir la transacción en caso de error
                 response("er", "Error al registrar suscripcion: " . $stmt4->error);
             }
         } else {
-            response("er","Error al preparar la sentencia SQL: " . $connectivity->conn->error);
+            response("er", "Error al preparar la sentencia SQL: " . $connectivity->conn->error);
         }
     }
+}
+function ChronogramGenerate()
+{
+    $StartDate = new DateTime("now", new DateTimeZone("America/Lima"));
+    $interval = new DateInterval("P1M");
+    $array = [];
+    $day=$StartDate->format('d');
+    if($day>28){
+        for ($i = 0; $i < 12; $i++) {
+        
+            $StartDate->add($interval);
+            $LastDayOfMonth = clone $StartDate;
+            $LastDayOfMonth->modify('last day of this month');
+            $array[] = $LastDayOfMonth->format('Y-m-d');
+        }
+    }else{
+        for ($i = 0; $i < 12; $i++) {
+            $array[] = $StartDate->format('Y-m-d');
+            $StartDate->add($interval);
+        }
+    }
+    
+
+    return $array;
 }
 function insertUserAndPersonaBD(Connectivity $con, $identityCode, $customerLastName, $customerEmail, $customerFirstName, $customerPhone)
 {
