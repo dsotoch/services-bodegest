@@ -64,33 +64,6 @@ if ($_SERVER['REQUEST_METHOD'] === "POST") {
       header("Location: checkout.php");
       die();
     }
-    $fecha = date("Y-m-d\TH:i:sP");
-    $dia = date("d", strtotime($fecha));
-    $rule = "";
-    switch ($dia) {
-      case 28:
-        $dia_inicio = "28";
-        $rule = "RRULE:FREQ=MONTHLY;INTERVAL=1;BYMONTHDAY=$dia_inicio;COUNT=12";
-        break;
-      case 29:
-        $dia_inicio = "29";
-        $rule = "RRULE:FREQ=MONTHLY;INTERVAL=1;BYMONTHDAY=$dia_inicio;COUNT=12";
-        break;
-      case 30:
-        $dia_inicio = "30";
-        $rule = "RRULE:FREQ=MONTHLY;INTERVAL=1;BYMONTHDAY=$dia_inicio;COUNT=12";
-        break;
-      case 31:
-        $dia_inicio = "31";
-        $rule = "RRULE:FREQ=MONTHLY;INTERVAL=1;BYMONTHDAY=$dia_inicio;COUNT=12";
-        break;
-
-      default:
-        $dia_inicio = $dia;
-
-        $rule = "RRULE:FREQ=MONTHLY;INTERVAL=1;BYMONTHDAY=$dia_inicio;COUNT=12";
-        break;
-    }
     $store = array(
       "amount" => 2200,
       "currency" => "PEN",
