@@ -177,7 +177,7 @@ function ChronogramGenerate()
     $array = [];
     $day = $StartDate->format('d');
     if ($day > 28) {
-        for ($i = 0; $i < 12; $i++) {
+        for ($i = 0; $i < 36; $i++) {
 
             $StartDate->add($interval);
             $LastDayOfMonth = clone $StartDate;
