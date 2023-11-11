@@ -185,7 +185,7 @@ function ChronogramGenerate()
             $array[] = $LastDayOfMonth->format('Y-m-d');
         }
     } else {
-        for ($i = 0; $i < 12; $i++) {
+        for ($i = 0; $i < 36; $i++) {
             $array[] = $StartDate->format('Y-m-d');
             $StartDate->add($interval);
         }
