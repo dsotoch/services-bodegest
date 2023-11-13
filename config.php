@@ -20,10 +20,12 @@ $servername = $_ENV["SERVERNAME"];
 $username = $_ENV["USERNAMEDB"];
 $password = $_ENV["PASSWORDDB"];
 $database = $_ENV["DATABASE"];
+$soportephone=$_ENV["SOPORTPHONE"];
 define("SERVERNAME", $servername);
 define("USERNAMEDB", $username);
 define("PASSWORDDB", $password);
 define("DATABASE", $database);
+define("SOPORTPHONE",$soportephone);
 
 #SMTPHOST
 $smtpHost=$_ENV["SMTP_HOST"];

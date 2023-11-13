@@ -39,8 +39,7 @@ $identityCode = $responseData["customer"]["billingDetails"]["identityCode"];
 $sus_client = $identityCode;
 $plan = "BASICO";
 
-echo sendEmail($orderId, $plan, $sus_client, $customerEmail);
-die();
+die(sendEmail($orderId, $plan, $sus_client, $customerEmail));
 
 
 #VERIFICAR SI YA CUENTA CON UNA SUSCRIPCION
@@ -210,7 +209,7 @@ function sendEmail($suscripcion_id, $plan, $sus_client, $receiver)
         }
         $fecha_inicio = new DateTime("now", new DateTimeZone("America/Lima"));
         $fecha_formateada = $fecha_inicio->format('Y-m-d H:i:s');
-        $mail->Body = '<center><h2 style="color:blue;">Bienvenido a la Gran Familia Bodegest!</h2><p>Nos complace enormemente darte la bienvenida a nuestro excepcional equipo. Con tu incorporación, nuestros procesos de gestión de bodega alcanzan un nuevo nivel de seguridad y eficiencia, respaldados por nuestro compromiso con la excelencia en los servicios en línea. ¡Estamos emocionados por colaborar contigo en esta etapa tan emocionante y brindar soluciones innovadoras a través de nuestra plataforma en línea!</p><h3 style="color:red;">Detalles de tu Suscripción</h3></center><b>Suscripcion N°</b> <span>' . $suscripcion_id . '</span> <br><b>Plan</b> <span>' . $plan . '</span><br><b>Monto</b> <span>' . $monto . '</span><br><b>Fecha de Inicio</b> <span>' . $fecha_formateada . '</span><br><hr><center><h3 style="color:red;">Detalles de Acceso</h3></center><b>Url Aplicación</b> <span>' . URLBODEGEST . '</span><br><b>Usuario</b> <span>' . $receiver . '</span><br><b>Contraseña</b> <span>' . $sus_client . '</span><br><p>Si tienes problemas para iniciar sesión, comunícate con Soporte al número de WhatsApp 916715991.<b>Saludos de parte del equipo de Bodegest</b>';
+        $mail->Body = '<center><h2 style="color:blue;">Bienvenido a la Gran Familia Bodegest!</h2><p>Nos complace enormemente darte la bienvenida a nuestro excepcional equipo. Con tu incorporacion, nuestros procesos de gestion de bodega alcanzan un nuevo nivel de seguridad y eficiencia, respaldados por nuestro compromiso con la excelencia en los servicios en linea. ¡Estamos emocionados por colaborar contigo en esta etapa tan emocionante y brindar soluciones innovadoras a traves de nuestra plataforma en linea!</p><h3 style="color:red;">Detalles de tu Suscripcion</h3></center><b>Suscripcion N:</b> <span>' . $suscripcion_id . '</span> <br><b>Plan</b> <span>' . $plan . '</span><br><b>Monto</b> <span>' . $monto . '</span><br><b>Fecha de Inicio</b> <span>' . $fecha_formateada . '</span><br><hr><center><h3 style="color:red;">Detalles de Acceso</h3></center><b>Url de Acceso a la Aplicacion</b> <span>' . URLBODEGEST . '</span><br><b>Usuario</b> <span>' . $receiver . '</span><br><b>Password</b> <span>' . $sus_client . '</span><br><p>Si tienes problemas para iniciar sesion, comunicate con Soporte al numero de WhatsApp '.SOPORTPHONE.'.<b>Saludos de parte del equipo de Bodegest</b>';
         $mail->send();
         return true;
     } catch (Exception $th) {
