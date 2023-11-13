@@ -24,3 +24,19 @@ define("SERVERNAME", $servername);
 define("USERNAMEDB", $username);
 define("PASSWORDDB", $password);
 define("DATABASE", $database);
+
+#SMTPHOST
+$smtpHost=$_ENV["SMTP_HOST"];
+$smtpUserName=$_ENV["SMTP_USERNAME"];
+$smtpPass=$_ENV["SMTP_PASS"];
+$smtpPort=$_ENV["SMTP_PORT"];
+$sender=$_ENV["SENDER"];
+$urlBodegest=$_ENV["URL_BODEGEST"];
+define("SMTPHOST",$smtpHost);
+define("SMTPUSERNAME",$smtpUserName);
+define("SMTPPASS",$smtpPass);
+define("SMTPPORT",$smtpPort);
+define("SENDER",$sender);
+define("URLBODEGEST",$urlBodegest);
+
+

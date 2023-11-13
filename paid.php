@@ -1,4 +1,8 @@
 <?php
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\SMTP;
+
 require_once __DIR__ . '/config.php';
 
 session_start();
@@ -32,7 +36,7 @@ $token = $responseData['transactions'][0]['paymentMethodToken'];
 $detailedStatus = $responseData['transactions'][0]['detailedStatus'];
 $identityCode = $responseData["customer"]["billingDetails"]["identityCode"];
 $sus_client = $identityCode;
-
+$plan = "BASICO";
 
 
 #VERIFICAR SI YA CUENTA CON UNA SUSCRIPCION
@@ -47,7 +51,7 @@ if (!$connectivity->isConnectionActive()) {
 $sql = "SELECT id FROM users WHERE email = '$customerEmail'";
 $userId = $connectivity->getMysql($sql);
 if (!empty($userId)) {
-    suscription($connectivity, $userId, $token, $orderId, $sus_client);
+    suscription($connectivity, $userId, $token, $orderId, $sus_client, $customerEmail, $plan);
 } else {
     // El usuario no existe    
     if (insertUserAndPersonaBD($connectivity, $identityCode, $customerLastName, $customerEmail, $customerFirstName, $customerPhone)) {
@@ -55,7 +59,7 @@ if (!empty($userId)) {
         $sqll = "SELECT id FROM users WHERE email = '$customerEmail'";
         $userId = $connectivity->getMysql($sqll);
         $connectivity->conn->commit();
-        suscription($connectivity, $userId, $token, $orderId, $sus_client);
+        suscription($connectivity, $userId, $token, $orderId, $sus_client, $customerEmail, $plan);
     } else {
         response("er", "Datos proporcionados Invalidos.Intentalo mas tarde.");
         $connectivity->conn->close();
@@ -65,7 +69,7 @@ if (!empty($userId)) {
 }
 
 
-function suscription(Connectivity $connectivity, $userId, $token, $orderId, $sus_client)
+function suscription(Connectivity $connectivity, $userId, $token, $orderId, $sus_client, $customerEmail, $plan)
 {
 
     $sql2 = "SELECT * FROM suscripcions WHERE user_id = ? AND estado = 'ACTIVO'";
@@ -86,7 +90,7 @@ function suscription(Connectivity $connectivity, $userId, $token, $orderId, $sus
     } else {
         $fecha = new DateTime("now", new DateTimeZone("America/Lima"));
         $fechaparseada = $fecha->modify("+1 month")->format("Y-m-d\TH:i:sP");
-        $day=$fecha->format('d');
+        $day = $fecha->format('d');
         $rule = "RRULE:FREQ=MONTHLY;BYMONTHDAY=$day;INTERVAL=1";
         if ($fecha->format("d") > 28) {
             $rule = "RRULE:FREQ=MONTHLY;BYMONTHDAY=28,29,30,31;BYSETPOS=-1;INTERVAL=1";
@@ -151,9 +155,17 @@ function suscription(Connectivity $connectivity, $userId, $token, $orderId, $sus
                             $p++;
                         }
 
-                        $connectivity->conn->commit(); // Confirmar la transacción
-                        $stmt5->close();
-                        response("sus", "Suscripción creada Correctamente. En breve recibirás un Correo con todos los Datos.");
+
+                        $emailResponse = sendEmail($suscripcion_id, $plan, $sus_client, $customerEmail);
+                        if ($emailResponse) {
+                            $connectivity->conn->commit(); // Confirmar la transacción
+                            $stmt5->close();
+                            response("sus", "Suscripción creada Correctamente. En breve recibirás un Correo con todos los Datos.");
+                        } else {
+                            $connectivity->conn->rollback(); // Revertir la transacción en caso de error
+
+                            response("er", $emailResponse);
+                        }
                     } catch (Exception $e) {
                         $stmt5->close();
                         $connectivity->conn->rollback(); // Revertir la transacción en caso de error
@@ -168,6 +180,58 @@ function suscription(Connectivity $connectivity, $userId, $token, $orderId, $sus
                 response("er", "Error al preparar la sentencia SQL: " . $connectivity->conn->error);
             }
         }
+    }
+}
+function sendEmail($suscripcion_id, $plan, $sus_client, $receiver)
+{
+    $mail = new PHPMailer(true);
+    try {
+        //Configuraciones del Servidor
+        $mail->isSMTP();
+        $mail->Host = SMTPHOST;
+        $mail->SMTPAuth = true;
+        $mail->Username = SMTPUSERNAME;
+        $mail->Password = SMTPPASS;
+        $mail->SMTPSecure = 'tls';
+        $mail->Port = SMTPPORT;
+
+        //Configuraciones del correo a enviar
+        $mail->setFrom(SENDER);
+        $mail->addAddress($receiver);
+        $mail->isHTML(true);
+        $mail->Subject = 'Bienvenido a la Gran Familia Bodegest!';
+        $monto = 0.0;
+        if ($plan == "BASICO") {
+            $monto = 22.00;
+        }
+        $fecha_inicio = new DateTime("now", new DateTimeZone("America/Lima"));
+        $fecha_formateada = $fecha_inicio->format('Y-m-d H:i:s');
+        $mail->Body = '
+    <center>
+        <h2 style="color:blue;">Bienvenido a la Gran Familia Bodegest!</h2>
+        
+        <p>
+            Nos complace enormemente darte la bienvenida a nuestro excepcional equipo. Con tu incorporación, nuestros procesos de gestión de bodega alcanzan un nuevo nivel de seguridad y eficiencia, respaldados por nuestro compromiso con la excelencia en los servicios en línea. ¡Estamos emocionados por colaborar contigo en esta etapa tan emocionante y brindar soluciones innovadoras a través de nuestra plataforma en línea!
+        </p>
+        <h3 style="color:red;">Detalles de tu Suscripción</h3>
+    </center>
+    <b>Suscripcion N°</b> <span>' . $suscripcion_id . '</span> <br>
+    <b>Plan</b> <span>' . $plan . '</span><br>
+    <b>Monto</b> <span>' . $monto . '</span><br>
+    <b>Fecha de Inicio</b> <span>' . $fecha_formateada. '</span><br>
+    <hr>
+    <center>
+        <h3 style="color:red;">Detalles de Acceso</h3>
+    </center>
+    <b>Url Aplicación</b> <span>' . URLBODEGEST . '</span><br>
+    <b>Usuario</b> <span>' . $receiver . '</span><br>
+    <b>Contraseña</b> <span>' . $sus_client . '</span><br>
+    <p>Si tienes problemas para iniciar sesión, comunícate con Soporte al número de WhatsApp 916715991.
+    <b>Saludos de parte del equipo de Bodegest</b>';
+        $mail->send();
+        return true;
+    } catch (\Throwable $th) {
+        return $th->getMessage();
     }
 }
 function ChronogramGenerate()
