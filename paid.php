@@ -39,8 +39,6 @@ $identityCode = $responseData["customer"]["billingDetails"]["identityCode"];
 $sus_client = $identityCode;
 $plan = "BASICO";
 
-die(sendEmail($orderId, $plan, $sus_client, $customerEmail));
-
 
 #VERIFICAR SI YA CUENTA CON UNA SUSCRIPCION
 require_once __DIR__ . '/connectivity.php';
