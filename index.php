@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__ . '/vendor/autoload.php';
-require_once __DIR__.'/loadEnv.php';
+require_once __DIR__ . '/loadEnv.php';
 $adminurl = $_ENV['AdminURL'];
 $contact = $_ENV['CONTACT'] . 'Hola, Estoy Interesado en BodeGest ,Solicito una Demostración.';
 
@@ -23,7 +23,7 @@ if (isset($_COOKIE["contact"])) {
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
-  
+
 
   <!-- Bootstrap CSS -->
 
@@ -202,6 +202,20 @@ if (isset($_COOKIE["contact"])) {
     </div>
 
   </div>
+  <footer class="bg-dark text-light text-center py-4">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-6 text-lg-left">
+          <!-- Logo o ícono de "pago seguro" -->
+          <img src="./images/secure.png" alt="Pago Seguro" height="30">
+        </div>
+        <div class="col-lg-6 text-lg-right">
+          <!-- Logo de iZiPay -->
+          <img src="./images/izipay.png" alt="iZiPay" height="30">
+        </div>
+      </div>
+    </div>
+  </footer>
   <!-- Optional JavaScript; choose one of the two! -->
 
   <!-- Option 1: Bootstrap Bundle with Popper -->
