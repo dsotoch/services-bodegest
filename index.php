@@ -202,16 +202,17 @@ if (isset($_COOKIE["contact"])) {
     </div>
 
   </div>
+  <br>
   <footer class="bg-dark text-light text-center py-4">
     <div class="container">
       <div class="row">
         <div class="col-lg-6 text-lg-left">
           <!-- Logo o ícono de "pago seguro" -->
-          <img src="./images/secure.png" alt="Pago Seguro" height="30">
+          <img src="./images/secure.png" alt="Pago Seguro" height="50">
         </div>
         <div class="col-lg-6 text-lg-right">
           <!-- Logo de iZiPay -->
-          <img src="./images/izipay.png" alt="iZiPay" height="30">
+          <img src="./images/izipay.png" alt="iZiPay" height="50">
         </div>
       </div>
     </div>
