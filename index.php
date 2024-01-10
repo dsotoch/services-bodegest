@@ -38,7 +38,7 @@ if (isset($_COOKIE["contact"])) {
   <div class="container" id="leading">
     <div class="row">
       <div class="col-2 col-md-3 logo">
-        <a href="<?php echo $adminurl; ?>" target="_blank"> <img src="images/logo_pequeño.png" id="logo"></a>
+        <a href="<?php echo $adminurl; ?>" target="_blank"> <img src="images/logo_pequeño.png" id="logo" width="100px"></a>
       </div>
       <div class="col-10 col-md-9">
         <h5 class="title"><span class="bode">Bode</span><span class="gest">Gest</span> ¡Tu bodega más rentable!</h5>
