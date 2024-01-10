@@ -10,6 +10,8 @@ require_once __DIR__ . '/loadEnv.php';
 <script src="https://static.micuentaweb.pe/static/js/krypton-client/V4.0/stable/kr-payment-form.min.js"></script>
 <script src="https://static.micuentaweb.pe/static/js/krypton-client/V4.0/stable/kr-payment-form.min.js" kr-public-key=<?php echo PUBLIC_KEY ?> kr-post-url-success="paid.php" ; kr-language="es-ES">
 </script>
+<link rel="icon" href="/images/logo_pequeño.png" type="image/x-icon">
+
 <link rel="stylesheet" href="https://static.micuentaweb.pe/static/js/krypton-client/V4.0/ext/neon-reset.min.css">
 <script type="text/javascript" src="https://static.micuentaweb.pe/static/js/krypton-client/V4.0/ext/neon.js">
 </script>
