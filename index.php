@@ -18,6 +18,8 @@ if (isset($_COOKIE["contact"])) {
   <!-- Required meta tags -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="/images/logo_pequeño.png" type="image/x-icon">
+
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
   <link rel="stylesheet" href="index.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
@@ -36,7 +38,7 @@ if (isset($_COOKIE["contact"])) {
   <div class="container" id="leading">
     <div class="row">
       <div class="col-2 col-md-3 logo">
-        <a href="<?php echo $adminurl; ?>" target="_blank"> <img src="images/logo.png" id="logo"></a>
+        <a href="<?php echo $adminurl; ?>" target="_blank"> <img src="images/logo_pequeño.png" id="logo"></a>
       </div>
       <div class="col-10 col-md-9">
         <h5 class="title"><span class="bode">Bode</span><span class="gest">Gest</span> ¡Tu bodega más rentable!</h5>
