@@ -131,7 +131,7 @@ if ($_SERVER['REQUEST_METHOD'] === "POST") {
 
 ?>
 <center>
-  <div class="kr-embedded" kr-popin kr-form-token="<?php echo $formToken; ?>"></div>
+ <div style="border: 1px solid black;"> <div class="kr-embedded" kr-popin kr-form-token="<?php echo $formToken; ?>"></div></div>
 </center>
 <?php
 function response($key, $message)

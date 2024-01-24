@@ -36,7 +36,7 @@ if (isset($_COOKIE["contact"])) {
 
   <div class="container" id="leading">
     <div class="row">
-      <div class="col-12 col-md-3 logo">
+      <div class="col-12 col-md-3 logo ">
         <a href="<?php echo $adminurl; ?>" target="_blank"> <img src="images/logo_pequeño.png" id="logo" ></a>
         <br>
       </div>
